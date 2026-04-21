@@ -4,6 +4,8 @@ import com.minibytes.notes.dto.AuthResponse;
 import com.minibytes.notes.dto.LoginRequest;
 import com.minibytes.notes.dto.RegisterRequest;
 import com.minibytes.notes.entities.User;
+import com.minibytes.notes.exception.DuplicateResourceException;
+import com.minibytes.notes.exception.ResourceNotFoundException;
 import com.minibytes.notes.repositories.UserRepository;
 import com.minibytes.notes.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,18 +54,18 @@ public class AuthServiceImpl implements AuthService {
         );
 
         User user = userRepository.findByUsername(loginRequest.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         return generateAuthResponse(user);
     }
 
     private void validateRegistrationRequest(RegisterRequest registerRequest) {
         if (userRepository.existsByUsername(registerRequest.getUsername())) {
-            throw new RuntimeException("Username is already taken!");
+            throw new DuplicateResourceException("Username is already taken");
         }
 
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
-            throw new RuntimeException("Email is already in use!");
+            throw new DuplicateResourceException("Email is already in use");
         }
     }
 
