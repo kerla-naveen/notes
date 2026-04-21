@@ -8,12 +8,14 @@ import com.minibytes.notes.exception.DuplicateResourceException;
 import com.minibytes.notes.exception.ResourceNotFoundException;
 import com.minibytes.notes.repositories.UserRepository;
 import com.minibytes.notes.util.JwtUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class AuthServiceImpl implements AuthService {
 
@@ -41,6 +43,7 @@ public class AuthServiceImpl implements AuthService {
                 .build();
 
         User savedUser = userRepository.save(user);
+        log.info("User registered: username={}, role={}", savedUser.getUsername(), savedUser.getRole());
 
         return generateAuthResponse(savedUser);
     }
@@ -56,6 +59,7 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByUsername(loginRequest.getUsername())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
+        log.info("User logged in: username={}", user.getUsername());
         return generateAuthResponse(user);
     }
 

@@ -8,12 +8,14 @@ import com.minibytes.notes.exception.ResourceNotFoundException;
 import com.minibytes.notes.exception.TaskAccessDeniedException;
 import com.minibytes.notes.repositories.TaskRepository;
 import com.minibytes.notes.repositories.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class TaskServiceImpl implements TaskService {
 
@@ -35,7 +37,9 @@ public class TaskServiceImpl implements TaskService {
                 .user(user)
                 .build();
 
-        return toResponse(taskRepository.save(task));
+        TaskResponse response = toResponse(taskRepository.save(task));
+        log.info("Task created: id={}, title={}, user={}", response.getId(), response.getTitle(), username);
+        return response;
     }
 
     @Override
@@ -63,7 +67,9 @@ public class TaskServiceImpl implements TaskService {
         task.setDescription(request.getDescription());
         task.setStatus(request.getStatus());
 
-        return toResponse(taskRepository.save(task));
+        TaskResponse response = toResponse(taskRepository.save(task));
+        log.info("Task updated: id={}, user={}", id, username);
+        return response;
     }
 
     @Override
@@ -71,6 +77,7 @@ public class TaskServiceImpl implements TaskService {
         Task task = findTask(id);
         checkOwnership(task, username, isAdmin);
         taskRepository.delete(task);
+        log.info("Task deleted: id={}, user={}", id, username);
     }
 
     private Task findTask(Long id) {
