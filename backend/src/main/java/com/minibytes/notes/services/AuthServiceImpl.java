@@ -7,10 +7,12 @@ import com.minibytes.notes.entities.User;
 import com.minibytes.notes.enums.Role;
 import com.minibytes.notes.exception.DuplicateResourceException;
 import com.minibytes.notes.exception.ResourceNotFoundException;
+import com.minibytes.notes.exception.TaskAccessDeniedException;
 import com.minibytes.notes.repositories.UserRepository;
 import com.minibytes.notes.util.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,6 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 public class AuthServiceImpl implements AuthService {
+
+    @Value("${app.admin-secret}")
+    private String adminSecret;
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -35,14 +40,22 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public AuthResponse register(RegisterRequest registerRequest) {
-        validateRegistrationRequest(registerRequest);
+    public AuthResponse register(RegisterRequest request) {
+        validateRegistrationRequest(request);
+
+        Role role = Role.USER;
+        if ("ADMIN".equalsIgnoreCase(request.getRole())) {
+            if (request.getAdminSecret() == null || !adminSecret.equals(request.getAdminSecret())) {
+                throw new TaskAccessDeniedException("Invalid admin secret");
+            }
+            role = Role.ADMIN;
+        }
 
         User user = User.builder()
-                .username(registerRequest.getUsername())
-                .email(registerRequest.getEmail())
-                .password(passwordEncoder.encode(registerRequest.getPassword()))
-                .role(Role.USER)
+                .username(request.getUsername())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role(role)
                 .build();
 
         User savedUser = userRepository.save(user);
@@ -66,12 +79,11 @@ public class AuthServiceImpl implements AuthService {
         return generateAuthResponse(user);
     }
 
-    private void validateRegistrationRequest(RegisterRequest registerRequest) {
-        if (userRepository.existsByUsername(registerRequest.getUsername())) {
+    private void validateRegistrationRequest(RegisterRequest request) {
+        if (userRepository.existsByUsername(request.getUsername())) {
             throw new DuplicateResourceException("Username is already taken");
         }
-
-        if (userRepository.existsByEmail(registerRequest.getEmail())) {
+        if (userRepository.existsByEmail(request.getEmail())) {
             throw new DuplicateResourceException("Email is already in use");
         }
     }
