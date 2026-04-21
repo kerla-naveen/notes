@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -18,4 +20,6 @@ public class TaskResponse {
     private TaskStatus status;
     private Long userId;
     private String username;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

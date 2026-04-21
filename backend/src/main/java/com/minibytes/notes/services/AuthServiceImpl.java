@@ -4,6 +4,7 @@ import com.minibytes.notes.dto.AuthResponse;
 import com.minibytes.notes.dto.LoginRequest;
 import com.minibytes.notes.dto.RegisterRequest;
 import com.minibytes.notes.entities.User;
+import com.minibytes.notes.enums.Role;
 import com.minibytes.notes.exception.DuplicateResourceException;
 import com.minibytes.notes.exception.ResourceNotFoundException;
 import com.minibytes.notes.repositories.UserRepository;
@@ -14,6 +15,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -32,6 +34,7 @@ public class AuthServiceImpl implements AuthService {
     private JwtUtil jwtUtil;
 
     @Override
+    @Transactional
     public AuthResponse register(RegisterRequest registerRequest) {
         validateRegistrationRequest(registerRequest);
 
@@ -39,7 +42,7 @@ public class AuthServiceImpl implements AuthService {
                 .username(registerRequest.getUsername())
                 .email(registerRequest.getEmail())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
-                .role(registerRequest.getRole())
+                .role(Role.USER)
                 .build();
 
         User savedUser = userRepository.save(user);

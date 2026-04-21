@@ -2,6 +2,7 @@ package com.minibytes.notes.controllers;
 
 import com.minibytes.notes.dto.TaskRequest;
 import com.minibytes.notes.dto.TaskResponse;
+import com.minibytes.notes.enums.TaskStatus;
 import com.minibytes.notes.services.TaskService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +35,10 @@ public class TaskController {
     @GetMapping
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<List<TaskResponse>> getTasks(
-            @AuthenticationPrincipal UserDetails userDetails) {
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam(required = false) TaskStatus status) {
 
-        return ResponseEntity.ok(taskService.getTasks(userDetails.getUsername(), isAdmin(userDetails)));
+        return ResponseEntity.ok(taskService.getTasks(userDetails.getUsername(), isAdmin(userDetails), status));
     }
 
     @GetMapping("/{id}")

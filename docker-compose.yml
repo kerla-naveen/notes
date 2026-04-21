@@ -18,7 +18,7 @@ services:
       retries: 5
 
   app:
-    image: naveenkerla/notes:latest
+    build: ./backend
     container_name: notes_backend
     ports:
       - "8080:8080"
@@ -32,7 +32,15 @@ services:
       mysql:
         condition: service_healthy
     volumes:
-      - ./logs:/app/logs
+      - ./backend/logs:/app/logs
+
+  frontend:
+    build: ./frontend
+    container_name: notes_frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - app
 
 volumes:
   mysql_data:

@@ -4,6 +4,7 @@ import com.minibytes.notes.dto.TaskRequest;
 import com.minibytes.notes.dto.TaskResponse;
 import com.minibytes.notes.entities.Task;
 import com.minibytes.notes.entities.User;
+import com.minibytes.notes.enums.TaskStatus;
 import com.minibytes.notes.exception.ResourceNotFoundException;
 import com.minibytes.notes.exception.TaskAccessDeniedException;
 import com.minibytes.notes.repositories.TaskRepository;
@@ -11,6 +12,7 @@ import com.minibytes.notes.repositories.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,6 +28,7 @@ public class TaskServiceImpl implements TaskService {
     private UserRepository userRepository;
 
     @Override
+    @Transactional
     public TaskResponse createTask(TaskRequest request, String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -43,15 +46,23 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<TaskResponse> getTasks(String username, boolean isAdmin) {
-        List<Task> tasks = isAdmin
-                ? taskRepository.findAll()
-                : taskRepository.findByUser_Username(username);
+    @Transactional(readOnly = true)
+    public List<TaskResponse> getTasks(String username, boolean isAdmin, TaskStatus status) {
+        List<Task> tasks;
+
+        if (isAdmin) {
+            tasks = status != null ? taskRepository.findByStatus(status) : taskRepository.findAll();
+        } else {
+            tasks = status != null
+                    ? taskRepository.findByUser_UsernameAndStatus(username, status)
+                    : taskRepository.findByUser_Username(username);
+        }
 
         return tasks.stream().map(this::toResponse).collect(Collectors.toList());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public TaskResponse getTaskById(Long id, String username, boolean isAdmin) {
         Task task = findTask(id);
         checkOwnership(task, username, isAdmin);
@@ -59,6 +70,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    @Transactional
     public TaskResponse updateTask(Long id, TaskRequest request, String username, boolean isAdmin) {
         Task task = findTask(id);
         checkOwnership(task, username, isAdmin);
@@ -73,6 +85,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    @Transactional
     public void deleteTask(Long id, String username, boolean isAdmin) {
         Task task = findTask(id);
         checkOwnership(task, username, isAdmin);
@@ -100,6 +113,8 @@ public class TaskServiceImpl implements TaskService {
                 .status(task.getStatus())
                 .userId(task.getUser().getId())
                 .username(task.getUser().getUsername())
+                .createdAt(task.getCreatedAt())
+                .updatedAt(task.getUpdatedAt())
                 .build();
     }
 }
