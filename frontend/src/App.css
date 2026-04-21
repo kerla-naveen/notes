@@ -301,6 +301,187 @@ input:focus, select:focus {
 .filter-tab:hover { background: #f1f5f9; }
 .filter-tab.active { background: #3b82f6; color: white; border-color: #3b82f6; }
 
+/* ── Landing page ── */
+.landing-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+}
+
+.landing-hero {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.landing-hero h1 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 0.5rem;
+}
+
+.landing-hero p {
+  color: #64748b;
+  font-size: 1rem;
+}
+
+.portal-cards {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.portal-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 2rem;
+  width: 280px;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.portal-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+}
+
+.portal-card-body h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0.5rem 0 0.4rem;
+}
+
+.portal-card-body p {
+  font-size: 0.875rem;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+.portal-label {
+  display: inline-block;
+  padding: 0.2rem 0.65rem;
+  border-radius: 9999px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.user-label  { background: #dbeafe; color: #1d4ed8; }
+.admin-label { background: #ede9fe; color: #6d28d9; }
+
+.portal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.btn-portal {
+  display: block;
+  text-align: center;
+  padding: 0.6rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: opacity 0.15s, background 0.15s;
+}
+
+.btn-portal-user         { background: #3b82f6; color: white; }
+.btn-portal-user:hover   { background: #2563eb; }
+.btn-portal-user-outline { border: 1px solid #3b82f6; color: #3b82f6; }
+.btn-portal-user-outline:hover { background: #eff6ff; }
+
+.btn-portal-admin         { background: #7c3aed; color: white; }
+.btn-portal-admin:hover   { background: #6d28d9; }
+.btn-portal-admin-outline { border: 1px solid #7c3aed; color: #7c3aed; }
+.btn-portal-admin-outline:hover { background: #f5f3ff; }
+
+/* ── Role tabs (login / register) ── */
+.role-tabs {
+  display: flex;
+  background: #f1f5f9;
+  border-radius: 0.5rem;
+  padding: 0.25rem;
+  margin-bottom: 1.5rem;
+  gap: 0.25rem;
+}
+
+.role-tab {
+  flex: 1;
+  padding: 0.45rem 0;
+  border: none;
+  border-radius: 0.375rem;
+  background: transparent;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  color: #94a3b8;
+  transition: all 0.15s;
+}
+
+.role-tab.active-user {
+  background: white;
+  color: #3b82f6;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
+}
+
+.role-tab.active-admin {
+  background: white;
+  color: #7c3aed;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
+}
+
+/* ── Admin-themed auth pages ── */
+.admin-bg { background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); }
+
+.auth-card.admin-theme input:focus,
+.auth-card.admin-theme select:focus {
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgb(124 58 237 / 0.1);
+}
+
+.auth-card.admin-theme .auth-link a { color: #7c3aed; }
+
+.btn-admin { background: #7c3aed; }
+.btn-admin:hover:not(:disabled) { background: #6d28d9; }
+
+/* ── Role indicator on auth pages ── */
+.auth-role-indicator {
+  text-align: center;
+  margin-bottom: 0.75rem;
+}
+
+.portal-tag {
+  display: inline-block;
+  padding: 0.2rem 0.65rem;
+  border-radius: 9999px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.portal-tag.user  { background: #dbeafe; color: #1d4ed8; }
+.portal-tag.admin { background: #ede9fe; color: #6d28d9; }
+
+/* ── Field hint ── */
+.field-hint {
+  display: block;
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin-top: 0.25rem;
+}
+
 /* ── Task date & owner ── */
 .task-date {
   font-size: 0.7rem;
