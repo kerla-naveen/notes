@@ -1,0 +1,81 @@
+package com.minibytes.notes.services;
+
+import com.minibytes.notes.dto.AuthResponse;
+import com.minibytes.notes.dto.LoginRequest;
+import com.minibytes.notes.dto.RegisterRequest;
+import com.minibytes.notes.entities.User;
+import com.minibytes.notes.repositories.UserRepository;
+import com.minibytes.notes.util.JwtUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+@Service
+public class AuthServiceImpl implements AuthService {
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @Override
+    public AuthResponse register(RegisterRequest registerRequest) {
+        validateRegistrationRequest(registerRequest);
+
+        User user = User.builder()
+                .username(registerRequest.getUsername())
+                .email(registerRequest.getEmail())
+                .password(passwordEncoder.encode(registerRequest.getPassword()))
+                .role(registerRequest.getRole())
+                .build();
+
+        User savedUser = userRepository.save(user);
+
+        return generateAuthResponse(savedUser);
+    }
+
+    @Override
+    public AuthResponse login(LoginRequest loginRequest) {
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginRequest.getUsername(),
+                        loginRequest.getPassword())
+        );
+
+        User user = userRepository.findByUsername(loginRequest.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return generateAuthResponse(user);
+    }
+
+    private void validateRegistrationRequest(RegisterRequest registerRequest) {
+        if (userRepository.existsByUsername(registerRequest.getUsername())) {
+            throw new RuntimeException("Username is already taken!");
+        }
+
+        if (userRepository.existsByEmail(registerRequest.getEmail())) {
+            throw new RuntimeException("Email is already in use!");
+        }
+    }
+
+    private AuthResponse generateAuthResponse(User user) {
+        String token = jwtUtil.generateToken(user.getUsername(), user.getRole().name());
+
+        return AuthResponse.builder()
+                .token(token)
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .role(user.getRole().name())
+                .build();
+    }
+}
