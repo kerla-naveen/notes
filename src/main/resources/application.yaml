@@ -5,9 +5,9 @@ spring:
   application:
     name: notes
   datasource:
-    url: jdbc:mysql://localhost:3306/notes_db
-    username: app_user
-    password: password
+    url: ${DB_URL:jdbc:mysql://localhost:3306/notes_db}
+    username: ${DB_USERNAME:app_user}
+    password: ${DB_PASSWORD:password}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -19,5 +19,15 @@ spring:
         format_sql: true
 
 jwt:
-  secret: mySecretKeyForJWT12345678901234567890
-  expiration: 86400
+  secret: ${JWT_SECRET:mySecretKeyForJWT12345678901234567890}
+  expiration: ${JWT_EXPIRATION:86400}
+
+logging:
+  level:
+    com.minibytes.notes: INFO
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} %-5level [%thread] %logger{36} - %msg%n"
+  file:
+    name: logs/notes-app.log
