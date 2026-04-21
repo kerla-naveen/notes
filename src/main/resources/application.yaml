@@ -1,3 +1,19 @@
+server:
+  port: 8080
+
 spring:
   application:
     name: notes
+  datasource:
+    url: jdbc:mysql://localhost:3306/notes_db
+    username: app_user
+    password: password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
